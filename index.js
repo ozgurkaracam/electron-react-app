@@ -1,40 +1,30 @@
-const { app,BrowserWindow,Tray } = require('electron')
+const { app,BrowserWindow,Tray,ipcMain } = require('electron')
 const path=require('path')
+
+const TimerTray =require('./src/classes/TimerTray')
+const FirstWindow =require('./src/classes/FirstWindow')
 let mainWindow,tray;
 
+
 app.on('ready',()=>{
-    mainWindow=new BrowserWindow({
-
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-
-        },
-        width:300,
-        height:500,
-        resizable:false,
-        frame:false,
-        show:true
-    })
-
-    mainWindow.loadURL(`file://${__dirname}/src/index.html`)
+    mainWindow=new FirstWindow(`file://${__dirname}/src/index.html`);
     let iconName=process.platform === 'darwin' ? 'iconTemplate.png' : 'windows-icon.png';
-    tray=new Tray(path.join(__dirname,'./src/assets/'+iconName))
-    const {x,y}=tray.getBounds()
-    const {width,height}=mainWindow.getBounds()
+    tray=new TimerTray(path.join(__dirname,'./src/assets/'+iconName),mainWindow)
+    const {x}=tray.getBounds()
+    const {width}=mainWindow.getBounds()
     mainWindow.setBounds({
-        width,
-        height,
         y:0,
         x:x+width*5/2
     })
-    tray.on("click",()=>{
-        mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
-    })
 
-    mainWindow.on("blur",()=>{
-        mainWindow.hide()
-    })
+
+
+
+
 
     app.dock.hide()
+})
+
+ipcMain.on("update-title",(e,d)=>{
+    tray.setTitle(d)
 })

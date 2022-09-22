@@ -6,7 +6,7 @@ import TasksIndex from "./TasksIndex";
 import TasksShow from "./TasksShow";
 import Timer from "../utils/Timer";
 import Settings from "./Settings";
-
+import {ipcRenderer} from 'electron';
 const APP_DATA = JSON.parse(localStorage.getItem("__INITIAL_STATE__"));
 
 const INITIAL_STATE = {
@@ -48,7 +48,7 @@ class App extends Component {
   };
 
   updateTrayText = title => {
-
+    ipcRenderer.send("update-title",title)
   };
 
   timerHasExpired = () => {
